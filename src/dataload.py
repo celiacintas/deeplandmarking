@@ -30,7 +30,7 @@ class DataLoader(object):
         for images and [-1, 1] for landmarks coordinates.
         """
         df = pd.read_csv(self.data_fn)
-        df['Image'] = df['Image'].apply(lambda im: np.fromstring(im, sep=' '))
+        df['Image'] = df['Image'].apply(lambda im: np.fromstring(str(im), sep=' '))
         self.image_size = np.sqrt(df['Image'][0].shape[0])
         df = df.dropna()  # drop all rows that have missing values in them
         X = np.vstack(df['Image'].values) / 255.  # scale pixel to [0, 1]
