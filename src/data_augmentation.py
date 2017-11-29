@@ -1,6 +1,7 @@
 import numpy as np
 from nolearn.lasagne import BatchIterator
 
+
 # TODO add more rotations degree and contranst funct
 class FlipBatchIterator(BatchIterator):
 
