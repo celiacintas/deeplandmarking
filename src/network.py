@@ -1,6 +1,6 @@
 import numpy as np
 import theano
-from nolearn.lasagne import BatchIterator
+import pickle
 from lasagne.updates import nesterov_momentum
 from nolearn.lasagne import NeuralNet
 from sklearn.metrics import mean_squared_error, mean_absolute_error
@@ -21,22 +21,6 @@ class AdjustVariable(object):
         epoch = train_history[-1]['epoch']
         new_value = np.float32(self.ls[epoch - 1])
         getattr(nn, self.name).set_value(new_value)
-
-
-class FlipBatchIterator(BatchIterator):
-
-    def transform(self, xb, yb):
-        xb, yb = super(FlipBatchIterator, self).transform(xb, yb)
-        # TODO use rotate from scipy
-        bs = xb.shape[0]
-        indices = np.random.choice(bs, bs / 2, replace=False)  # /2 choose all
-        xb[indices] = xb[indices, :, :, ::-1]
-
-        if yb is not None:
-            # Horizontal flip of all x coordinates:
-            yb[indices, ::2] = yb[indices, ::2] * -1
-
-        return xb, yb
 
 
 class EarlyStopping(object):
@@ -75,8 +59,10 @@ class CNN(object):
         # TODO crossval till we have the RL
         pass
 
-    def training(self):
-        pass
+    def training(self, X_train, y_train, out_folder='/tmp/'):
+        self.cnn_net.fit(X_train, y_train)
+        with open(out_folder + 'cnn_net.pickle', 'wb') as f:
+            pickle.dump(self.cnn_net, f, -1)
 
     def plot_loss(self, x_label='epoch', y_label='loss',
                   out='/tmp/loss_plot.png'):
